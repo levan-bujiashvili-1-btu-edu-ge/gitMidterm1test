@@ -29,17 +29,17 @@ to launch ec2 instance:
 
 ### arguments:
         
-        -vpc True #to create vpc (takes only True or False arguments)
+        -vpc True //to create vpc (takes only True or False arguments)
 
-        -igw True #for script to create internet gateway and atttach it to vpc (takes only True or False arguments)
+        -igw True //for script to create internet gateway and atttach it to vpc (takes only True or False arguments)
 
-        -pub/--public_subnets X(number of subnets) #to pass amount of public subnets to create with vpc
+        -pub/--public_subnets X(number of subnets) //to pass amount of public subnets to create with vpc
 
-        -priv/--private_subnets X(number of subnets) #to pass amount of private subnets to create with vpc
+        -priv/--private_subnets X(number of subnets) //to pass amount of private subnets to create with vpc
 
-        -vid/--vpc_id #pass vpc id to which you want operation on e.g. launch instance
+        -vid/--vpc_id //pass vpc id to which you want operation on e.g. launch instance
 
-        -sid/--subnet_id #pass subnet id to which we want operation on e.g launch instance
+        -sid/--subnet_id //pass subnet id to which we want operation on e.g launch instance
 
 there's time.sleep() function used to slow down creating subnets. Otherways it gives errors
 
