@@ -43,4 +43,32 @@ to launch ec2 instance:
 
 there's time.sleep() function used to slow down creating subnets. Otherways it gives errors
 
+# RDS
+## launching RDS
 
+command example:    
+
+    python main.py -vid vpc-081b5d31efb75b7f7 --rds_type mysql -rds_i mysql1818-btu -sid subnet-067ffb82773cac341 subnet-01e3488b70076ea46
+
+
+### Arguments for launching RDS:
+    
+    -rds_i/--rds_identifier //takes unique name for RDS database
+
+    -rds/--rds_type //to pass what type of rds do you want made. takes only["mysql", "postgres", "mariadb", "aurora-mysql"]. currently working only for mysql
+    
+    -vid/--vpc_id //pass vpc id to which we create RDS on
+
+    -sid/--subnet_id //subnets to where RDS database will be setup. requires passing of at least 2 different AZ subnets
+
+## Getting RDS details
+
+command example:
+
+    python main.py -rds_dets True -rds_i mysql1818-btu
+
+### Arguments for getting RDS details:
+
+    -rds_dets/--rds_details //takes only ["True","False"] arguments. if true, returns details
+    -rds_i/--rds_identifier //takes database's unique identifier to return details of
+    

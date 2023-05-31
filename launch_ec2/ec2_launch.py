@@ -1,3 +1,4 @@
+import random
 import urllib
 import ssl
 import certifi
@@ -20,6 +21,7 @@ def create_key_pair(key_name, aws_ec2_client):
 
 
 def create_security_group(aws_ec2_client, name, description, VPC_ID):
+    name_addition = ""
     try:
         response = aws_ec2_client.create_security_group(Description=description,
                                                         GroupName=name,
@@ -31,7 +33,8 @@ def create_security_group(aws_ec2_client, name, description, VPC_ID):
         return group_id
     except ClientError:
         try:
-            name = name + "1"
+            name_addition = str(random.randint(0, 999))
+            name = name + name_addition
             response = aws_ec2_client.create_security_group(Description=description,
                                                             GroupName=name,
                                                             VpcId=VPC_ID)
@@ -41,7 +44,8 @@ def create_security_group(aws_ec2_client, name, description, VPC_ID):
 
             return group_id
         except ClientError:
-            name = name + "2"
+            name_addition = str(random.randint(0, 999))
+            name = name + name_addition
             response = aws_ec2_client.create_security_group(Description=description,
                                                             GroupName=name,
                                                             VpcId=VPC_ID)
@@ -76,7 +80,6 @@ def add_ssh_access_sg(sg_id, ip_address, aws_ec2_client):
 
 
 def add_http_access_sg(sg_id, aws_ec2_client):
-
     response = aws_ec2_client.authorize_security_group_ingress(
         CidrIp="0.0.0.0/0",
         FromPort=80,
@@ -185,7 +188,7 @@ def create_ec2(ec2_client, args):
 
     # only concrete ip rule
     add_ssh_access_sg(security_group_id, my_ip, ec2_client)
-    add_http_access_sg(security_group_id,ec2_client)
+    add_http_access_sg(security_group_id, ec2_client)
 
     #  # EC2
     run_ec2(ec2_client, security_group_id, subnet_id, 'btu-custom-instance')
