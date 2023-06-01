@@ -2,13 +2,15 @@ from botocore.exceptions import ClientError
 
 from launch_ec2.ec2_launch import create_security_group
 
+BASE_MYSQL_STORAGE = 60
 
-def create_mysql_instance(rds_client, security_group_id, rds_identifier, subnet_group):
+
+def create_mysql_instance(rds_client, security_group_id, rds_identifier):
     """Creates a new RDS instance that is associated with the given security group."""
     response = rds_client.create_db_instance(
         DBName='myrds',
         DBInstanceIdentifier=rds_identifier,
-        AllocatedStorage=60,
+        AllocatedStorage=BASE_MYSQL_STORAGE,
         DBInstanceClass='db.t4g.micro',
         Engine='mysql',
         MasterUsername='mysqlusername',
@@ -29,7 +31,9 @@ def create_mysql_instance(rds_client, security_group_id, rds_identifier, subnet_
                 'Value': 'First RDS'
             },
         ],
+        MaxAllocatedStorage=100,
         StorageType='gp2',
+        AllowMajorVersionUpgrade=True,
         # EnablePerformanceInsights=True, # performance insights not used with mysql
         # PerformanceInsightsRetentionPeriod=7,
         DeletionProtection=False,
@@ -39,6 +43,43 @@ def create_mysql_instance(rds_client, security_group_id, rds_identifier, subnet_
     print(f"Instance {_id} was created")
 
     return response
+
+
+def modify_mysql_instance(rds_client, rds_identifier, increment):
+    """Creates a new RDS instance that is associated with the given security group."""
+    response = rds_client.modify_db_instance(
+        DBInstanceIdentifier=rds_identifier,
+        AllocatedStorage=BASE_MYSQL_STORAGE + increment,
+        ApplyImmediately=True,
+        AllowMajorVersionUpgrade=True,
+        # DBInstanceClass='db.t4g.micro',
+        # Engine='mysql',
+        # MasterUsername='mysqlusername',
+        # MasterUserPassword='mysqlpass',
+        # VpcSecurityGroupIds=[security_group_id],
+        # DBSubnetGroupName="subnets_for_db",
+        # BackupRetentionPeriod=7,
+        # port for mysql 3306
+        # Port=3306,
+        # MultiAZ=False,
+        # EngineVersion='8.0.32',
+        # AutoMinorVersionUpgrade=True,
+        # Iops=123, # Necessary when StorageType is 'io1'
+        # PubliclyAccessible=True,
+        # Tags=[
+        #     {
+        #         'Key': 'Name',
+        #         'Value': 'First RDS'
+        #     },
+        # ],
+        # StorageType='gp2',
+        MaxAllocatedStorage=100,
+        # EnablePerformanceInsights=True, # performance insights not used with mysql
+        # PerformanceInsightsRetentionPeriod=7,
+        # DeletionProtection=False,
+    )
+    print("RDS Modified!")
+    return BASE_MYSQL_STORAGE == BASE_MYSQL_STORAGE + increment
 
 
 def add_rds_access_sg(sg_id, aws_ec2_client):
@@ -103,12 +144,28 @@ def delete_rds_pass(rds_cient, identifer):
     print(response)
 
 
-def create_db_subnet_group(aws_rds_client, subnet_id):
+def create_db_subnet_group(aws_rds_client, multiple_subnet_id):
     response = aws_rds_client.create_db_subnet_group(
         DBSubnetGroupName='subnets_for_db',
         DBSubnetGroupDescription='subnets_for_db',
-        SubnetIds=subnet_id,
+        SubnetIds=multiple_subnet_id,
     )
+    return response
+
+
+def create_db_snapshot(aws_rds_client, rds_identifier, snap_identifier):
+    response = aws_rds_client.create_db_snapshot(
+        DBSnapshotIdentifier=snap_identifier,
+        DBInstanceIdentifier=rds_identifier,
+        Tags=[
+            {
+                'Key': 'string',
+                'Value': snap_identifier
+            },
+        ]
+    )
+    print("snapshot made!")
+    print(snap_identifier)
     return response
 
 
@@ -119,9 +176,9 @@ def launch_rds(ec2_client, rds_client, args):
                                               "rds-sg", "Security group to enable access on rds", vpc_id)
     # open connection from any ip to rds
     add_rds_access_sg(security_group_id, ec2_client)
-    subnet_group = create_db_subnet_group(rds_client, args.subnet_id)
+    # subnet_group = create_db_subnet_group(rds_client, args.multiple_subnet_id)
     # create mysql database
-    create_mysql_instance(rds_client, security_group_id, args.rds_identifier, subnet_group)
+    create_mysql_instance(rds_client, security_group_id, args.rds_identifier)
 
 
 def get_rds_details(rds_client, args):

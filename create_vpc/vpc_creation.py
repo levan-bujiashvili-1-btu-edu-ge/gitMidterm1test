@@ -1,12 +1,14 @@
 import time
 from pprint import pprint
 
+from auth.auth_ec2 import init_ec2_client
+
 
 def create_vpc(ec2_client):
     result = ec2_client.create_vpc(CidrBlock="10.0.0.0/16")
-    vpc = result.get("Vpc")
-    print(vpc)
-    return vpc.get("VpcId")
+    my_vpc = result.get("Vpc")
+    print(my_vpc)
+    return my_vpc.get("VpcId")
 
 
 def add_name_tag(vpc_id, ec2_client):
@@ -122,7 +124,8 @@ def create_route_table_without_route(vpc_id, ec2_client):
     return route_table_id
 
 
-def setupVPC(args, ec2_client):
+def setupVPC(args):
+    ec2_client = init_ec2_client()
     vpc_id = create_vpc(ec2_client)
     time.sleep(5)
     add_name_tag(vpc_id, ec2_client)
