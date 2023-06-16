@@ -103,4 +103,3 @@ command example:
 ### Arguments:
     
     -ltbs/--list_tables #lists all tables in current region chosen in .env
-...........
