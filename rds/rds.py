@@ -1,3 +1,4 @@
+import botocore
 from botocore.exceptions import ClientError
 
 from launch_ec2.ec2_launch import create_security_group
@@ -33,7 +34,7 @@ def create_mysql_instance(rds_client, security_group_id, rds_identifier):
         ],
         MaxAllocatedStorage=100,
         StorageType='gp2',
-        AllowMajorVersionUpgrade=True,
+        #AllowMajorVersionUpgrade=True,
         # EnablePerformanceInsights=True, # performance insights not used with mysql
         # PerformanceInsightsRetentionPeriod=7,
         DeletionProtection=False,
@@ -176,7 +177,10 @@ def launch_rds(ec2_client, rds_client, args):
                                               "rds-sg", "Security group to enable access on rds", vpc_id)
     # open connection from any ip to rds
     add_rds_access_sg(security_group_id, ec2_client)
-    # subnet_group = create_db_subnet_group(rds_client, args.multiple_subnet_id)
+    try:
+        create_db_subnet_group(rds_client, args.multiple_subnet_id)
+    except:
+        print("db_subnet_group already exists")
     # create mysql database
     create_mysql_instance(rds_client, security_group_id, args.rds_identifier)
 
@@ -184,3 +188,6 @@ def launch_rds(ec2_client, rds_client, args):
 def get_rds_details(rds_client, args):
     # test connection to rds instance
     print_connection_params(rds_client, args.rds_identifier)
+
+# def create_bastion_rds(rds_client, args):
+#     rds_subnet_group = create_db_subnet_group(rds_client, multiple_subnet_id)

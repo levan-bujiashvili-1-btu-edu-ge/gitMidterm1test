@@ -99,3 +99,43 @@ def dynamo_db_arguments(parser):
                         required=False)
 
     return parser
+
+
+def bastion_arguments(parser):
+    parser.add_argument("-rds",
+                        "--rds_type",
+                        required=False,
+                        choices=["mysql",
+                                 "postgres",
+                                 "mariadb",
+                                 "aurora-mysql"])
+
+    parser.add_argument("-sids",
+                        "--multiple_subnet_id",
+                        required=False,
+                        nargs="*")
+
+    parser.add_argument("-vid", "--vpc_id",
+                        required=False)
+
+    parser.add_argument("-rds_i",
+                        "--rds_identifier",
+                        required=False)
+
+    parser.add_argument("-ec2",
+                        "--create_ec2",
+                        default="False",
+                        choices=["True", "False"],
+                        required=False)
+
+    parser.add_argument("-bastion",
+                        "--create_bastion_host",
+                        default="False",
+                        choices=["True", "False"],
+                        required=False)
+
+    parser.add_argument("-sid",
+                        "--subnet_id",
+                        required=False,
+                        nargs="?")
+    return parser

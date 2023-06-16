@@ -103,3 +103,22 @@ command example:
 ### Arguments:
     
     -ltbs/--list_tables #lists all tables in current region chosen in .env
+
+# Bastion host
+
+## launching Bastion host
+command example
+    
+    python main.py bastion_host -bastion True -sid subnet-067ffb82773cac341 -vid vpc-081b5d31efb75b7f7 --rds_type mysql -rds_i mysql1818-btu -sids subnet-067ffb82773cac341 subnet-01e3488b70076ea46
+
+### Arguments
+    
+    -vid/--vpc_id //pass vpc id to which you want operation on e.g. launch instance
+
+    -sid/--subnet_id //pass subnet id to which we want operation on e.g launch instance
+
+    -sids/--multiple_subnet_id //subnets to where RDS database will be setup. requires passing of at least 2 different AZ subnets
+
+    -rds_i/--rds_identifier //takes database's unique identifier to return details of
+
+    -rds/--rds_type //to pass what type of rds do you want made. takes only["mysql", "postgres", "mariadb", "aurora-mysql"]. currently working only for mysql
