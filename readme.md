@@ -109,8 +109,8 @@ command example:
 ## launching Bastion host
 command example
     
-    python main.py bastion_host -bastion True -sid subnet-067ffb82773cac341 -vid vpc-081b5d31efb75b7f7 --rds_type mysql -rds_i mysql1818-btu -sids subnet-067ffb82773cac341 subnet-01e3488b70076ea46
-
+    python main.py bastion_host -bastion True -sid subnet-067ffb82773cac341 -vid vpc-081b5d31efb75b7f7 --rds_type mysql -rds_i mysqlforbastion2 -sids subnet-02bdf0312f21d2fc7 subnet-01a8232273f02ec40
+### EC2 key is generated in your project folder, my-demo-key.pem
 ### Arguments
     
     -vid/--vpc_id //pass vpc id to which you want operation on e.g. launch instance
@@ -122,3 +122,4 @@ command example
     -rds_i/--rds_identifier //takes database's unique identifier to return details of
 
     -rds/--rds_type //to pass what type of rds do you want made. takes only["mysql", "postgres", "mariadb", "aurora-mysql"]. currently working only for mysql
+    

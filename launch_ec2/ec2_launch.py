@@ -205,4 +205,4 @@ def create_bastion_host(ec2_client, args):
     ip_address_for_ssh = "0.0.0.0"
     security_group_id = create_security_group(ec2_client, "bastion-sg", "Security group to enable access on ec2", vpc_id)
     add_ssh_access_sg(security_group_id, ip_address_for_ssh, ec2_client)
-    run_ec2(ec2_client, security_group_id, subnet_id, 'btu-custom-instance')
+    run_ec2(ec2_client, security_group_id, subnet_id, 'bastion_host')

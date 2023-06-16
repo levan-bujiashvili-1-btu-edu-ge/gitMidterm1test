@@ -34,7 +34,47 @@ def create_mysql_instance(rds_client, security_group_id, rds_identifier):
         ],
         MaxAllocatedStorage=100,
         StorageType='gp2',
-        #AllowMajorVersionUpgrade=True,
+        # AllowMajorVersionUpgrade=True,
+        # EnablePerformanceInsights=True, # performance insights not used with mysql
+        # PerformanceInsightsRetentionPeriod=7,
+        DeletionProtection=False,
+    )
+
+    _id = response.get("DBInstance").get("DBInstanceIdentifier")
+    print(f"Instance {_id} was created")
+
+    return response
+
+
+def create_mysql_instance_for_bastion(rds_client, security_group_id, rds_identifier):
+    """Creates a new RDS instance that is associated with the given security group."""
+    response = rds_client.create_db_instance(
+        DBName='myrds',
+        DBInstanceIdentifier=rds_identifier,
+        AllocatedStorage=BASE_MYSQL_STORAGE,
+        DBInstanceClass='db.t4g.micro',
+        Engine='mysql',
+        MasterUsername='mysqlusername',
+        MasterUserPassword='mysqlpass',
+        VpcSecurityGroupIds=[security_group_id],
+        DBSubnetGroupName="private_subnets_for_db",
+        BackupRetentionPeriod=7,
+        # port for mysql 3306
+        Port=3306,
+        MultiAZ=False,
+        EngineVersion='8.0.32',
+        AutoMinorVersionUpgrade=True,
+        # Iops=123, # Necessary when StorageType is 'io1'
+        PubliclyAccessible=True,
+        Tags=[
+            {
+                'Key': 'Name',
+                'Value': 'First RDS'
+            },
+        ],
+        MaxAllocatedStorage=100,
+        StorageType='gp2',
+        # AllowMajorVersionUpgrade=True,
         # EnablePerformanceInsights=True, # performance insights not used with mysql
         # PerformanceInsightsRetentionPeriod=7,
         DeletionProtection=False,
@@ -154,6 +194,15 @@ def create_db_subnet_group(aws_rds_client, multiple_subnet_id):
     return response
 
 
+def create_private_db_subnet_group(aws_rds_client, multiple_subnet_id):
+    response = aws_rds_client.create_db_subnet_group(
+        DBSubnetGroupName='private_subnets_for_db',
+        DBSubnetGroupDescription='private_subnets_for_db',
+        SubnetIds=multiple_subnet_id,
+    )
+    return response
+
+
 def create_db_snapshot(aws_rds_client, rds_identifier, snap_identifier):
     response = aws_rds_client.create_db_snapshot(
         DBSnapshotIdentifier=snap_identifier,
@@ -183,6 +232,21 @@ def launch_rds(ec2_client, rds_client, args):
         print("db_subnet_group already exists")
     # create mysql database
     create_mysql_instance(rds_client, security_group_id, args.rds_identifier)
+
+
+def launch_rds_for_bastion(ec2_client, rds_client, args):
+    vpc_id = args.vpc_id
+    # create security group for our rds instance
+    security_group_id = create_security_group(ec2_client,
+                                              "rds-sg", "Security group to enable access on rds", vpc_id)
+    # open connection from any ip to rds
+    add_rds_access_sg(security_group_id, ec2_client)
+    try:
+        create_private_db_subnet_group(rds_client, args.multiple_subnet_id)
+    except:
+        print("db_subnet_group already exists")
+    # create mysql database
+    create_mysql_instance_for_bastion(rds_client, security_group_id, args.rds_identifier)
 
 
 def get_rds_details(rds_client, args):
