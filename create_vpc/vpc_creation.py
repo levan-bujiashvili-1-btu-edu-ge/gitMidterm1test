@@ -46,6 +46,24 @@ def create_subnet(vpc_id, cidr_block, subnet_name, ec2_client):
     return subnet_id
 
 
+def create_private_subnet(vpc_id, cidr_block, ec2_client):
+    response = ec2_client.create_subnet(VpcId=vpc_id, CidrBlock=cidr_block)
+    time.sleep(2)
+    subnet = response.get("Subnet")
+    pprint(subnet)
+    subnet_id = subnet.get("SubnetId")
+    ec2_client.create_tags(
+        Resources=[subnet_id],
+        Tags=[
+            {
+                "Key": "Name",
+                "Value": "forTask12x2"
+            },
+        ],
+    )
+    return subnet_id
+
+
 def create_or_get_igw(vpc_id, ec2_client):
     igw_id = None
     igw_response = ec2_client.describe_internet_gateways(

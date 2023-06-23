@@ -12,11 +12,15 @@ def ec2_arguments(parser):
                         "--subnet_id",
                         required=False,
                         nargs="?")
-
+    parser.add_argument("-ssh_my_ip", required=False, default="True", action="store_true")
+    parser.add_argument("-sg_id", required=False)
     return parser
 
 
 def vpc_arguments(parser):
+    parser.add_argument("-vpc_id", required=False)
+    parser.add_argument("-create_private_subnet", type=str, required=False)
+
     parser.add_argument("-igw",
                         default="False",
                         choices=["True", "False"],
@@ -42,6 +46,10 @@ def vpc_arguments(parser):
 
 
 def rds_arguments(parser):
+    parser.add_argument("-new_pass", type=str, required=False)
+
+    parser.add_argument("-dbInstanceId", type=str, required=False)
+
     parser.add_argument("-rds",
                         "--rds_type",
                         required=False,
@@ -138,4 +146,11 @@ def bastion_arguments(parser):
                         "--subnet_id",
                         required=False,
                         nargs="?")
+    return parser
+
+
+def bucket_arguments(parser):
+    parser.add_argument("-organize", required=False)
+    parser.add_argument("-bn", "--bucket_name", required=False)
+    parser.add_argument("-upload_file", type=str, required=False)
     return parser

@@ -6,7 +6,6 @@ import urllib3
 from botocore.exceptions import ClientError
 
 
-
 def create_key_pair(key_name, aws_ec2_client):
     try:
         response = aws_ec2_client.create_key_pair(KeyName=key_name,
@@ -203,6 +202,13 @@ def create_bastion_host(ec2_client, args):
     vpc_id = args.vpc_id
     subnet_id = args.subnet_id
     ip_address_for_ssh = "0.0.0.0"
-    security_group_id = create_security_group(ec2_client, "bastion-sg", "Security group to enable access on ec2", vpc_id)
+    security_group_id = create_security_group(ec2_client, "bastion-sg", "Security group to enable access on ec2",
+                                              vpc_id)
     add_ssh_access_sg(security_group_id, ip_address_for_ssh, ec2_client)
     run_ec2(ec2_client, security_group_id, subnet_id, 'bastion_host')
+
+
+def give_access_to_ssh_sg(ec2_client, sg_id):
+    my_ip = get_my_public_ip()
+    add_ssh_access_sg(sg_id, my_ip, ec2_client)
+    print("done")

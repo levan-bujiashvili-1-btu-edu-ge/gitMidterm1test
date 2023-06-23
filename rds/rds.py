@@ -123,6 +123,43 @@ def modify_mysql_instance(rds_client, rds_identifier, increment):
     return BASE_MYSQL_STORAGE == BASE_MYSQL_STORAGE + increment
 
 
+def change_pass_mysql_instance(rds_client, rds_identifier, new_pass):
+    """Creates a new RDS instance that is associated with the given security group."""
+    if len(new_pass) >= 4:
+        response = rds_client.modify_db_instance(
+            DBInstanceIdentifier=rds_identifier,
+            # DBInstanceClass='db.t4g.micro',
+            # Engine='mysql',
+            # MasterUsername='mysqlusername',
+            MasterUserPassword=new_pass,
+            # VpcSecurityGroupIds=[security_group_id],
+            # DBSubnetGroupName="subnets_for_db",
+            # BackupRetentionPeriod=7,
+            # port for mysql 3306
+            # Port=3306,
+            # MultiAZ=False,
+            # EngineVersion='8.0.32',
+            # AutoMinorVersionUpgrade=True,
+            # Iops=123, # Necessary when StorageType is 'io1'
+            # PubliclyAccessible=True,
+            # Tags=[
+            #     {
+            #         'Key': 'Name',
+            #         'Value': 'First RDS'
+            #     },
+            # ],
+            # StorageType='gp2',
+            # MaxAllocatedStorage=100,
+            # EnablePerformanceInsights=True, # performance insights not used with mysql
+            # PerformanceInsightsRetentionPeriod=7,
+            # DeletionProtection=False,
+        )
+        print("RDS password Modified!")
+        return response
+    else:
+        print("new password must contain at least 4 characters")
+
+
 def add_rds_access_sg(sg_id, aws_ec2_client):
     response = aws_ec2_client.authorize_security_group_ingress(
         # CIDRIP="0.0.0.0/0",
